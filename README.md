@@ -4,12 +4,9 @@ English | [简体中文](README.zh-CN.md)
 
 Read the objects inside the game's Unity bundles, right in your browser.
 
-> **Experimental.** This project is an experiment in what exploring bundles in a browser can be. It may change a lot or be dropped, and its interface and URLs make no compatibility promises.
+It isn't clear yet what this project is useful for, but it can:
 
-## What it does
-
-Open bundles, or a whole folder of them, and the explorer reads them with the WebAssembly build of [sekai-exporter](https://github.com/StarMoe-org/sekai-exporter)'s core. Then you can:
-
+- open bundles, or a whole folder of them, and read them in the browser with the WebAssembly build of [sekai-exporter](https://github.com/StarMoe-org/sekai-exporter)'s core;
 - browse every bundle and its objects, filtered by name, class or path ID;
 - see a bundle's entries, the classes of its objects, and the bundles its external files resolve to;
 - read every field of an object, in stored order, with references as links to the objects they point to, across bundles;
