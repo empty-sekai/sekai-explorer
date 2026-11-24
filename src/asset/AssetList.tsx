@@ -21,7 +21,7 @@ export function AssetList({ bundle, assets }: { bundle: string; assets: PlannedA
           >
             <FormBadge form={asset.form} />
             <span className="truncate font-mono text-2xs" title={asset.name}>
-              {asset.name}
+              {withinBundle(asset.name, bundle)}
             </span>
           </button>
         </li>
@@ -36,4 +36,9 @@ export function FormBadge({ form }: { form: string }) {
       {form}
     </span>
   );
+}
+
+/** An asset's name without the name of its bundle, which every asset of the list shares. */
+function withinBundle(name: string, bundle: string): string {
+  return name.startsWith(`${bundle}/`) ? name.slice(bundle.length + 1) : name;
 }

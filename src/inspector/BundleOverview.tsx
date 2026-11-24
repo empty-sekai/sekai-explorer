@@ -1,5 +1,5 @@
-// What a bundle holds: its entries, the assets made from it, the classes of its objects, and the
-// files it depends on.
+// What a bundle holds: the assets made from it first, then the classes of its objects, its
+// entries, and the files it depends on.
 
 import { LoaderCircle } from "lucide-react";
 import { useGo } from "~/app/place";
@@ -17,9 +17,9 @@ export function BundleOverview({ catalog, bundle }: { catalog: Catalog; bundle: 
   return (
     <div className="max-w-4xl space-y-2 p-4">
       <h1 className="break-all font-mono text-sm">{bundle.name}</h1>
-      <Entries bundle={bundle} />
       <Assets bundle={bundle.name} />
       <Classes bundle={bundle} />
+      <Entries bundle={bundle} />
       <Externals catalog={catalog} bundle={bundle} />
     </div>
   );
@@ -55,6 +55,7 @@ function Entries({ bundle }: { bundle: BundleSummary }) {
   );
 }
 
+/** The assets of the defined forms, which are only part of what the bundle holds. */
 function Assets({ bundle }: { bundle: string }) {
   const { data: assets } = useAssets(bundle);
   return (
@@ -63,6 +64,7 @@ function Assets({ bundle }: { bundle: string }) {
         {m.assets()}
         {assets && ` · ${count(assets.length)}`}
       </SectionTitle>
+      <p className="mb-1.5 text-2xs text-ink-faint">{m.assets_partial()}</p>
       {!assets ? (
         <LoaderCircle className="size-4 animate-spin text-ink-faint" />
       ) : assets.length === 0 ? (
