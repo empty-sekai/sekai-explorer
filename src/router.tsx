@@ -1,4 +1,4 @@
-// Where the user is: a bundle, or an object of it, kept in the URL so that back, forward and
+// Where the user is: a bundle, an object of it or an asset it makes, kept in the URL so that back, forward and
 // links work. The URL lives in the hash, since the site is static and the data is local.
 
 import {
@@ -10,8 +10,11 @@ import {
 } from "@tanstack/react-router";
 import { Root } from "~/app/Root";
 
-/** A place: a bundle (`b`), or an object of it by serialized file (`f`) and path ID (`o`). */
-export type Place = { b?: string; f?: string; o?: string };
+/**
+ * A place: a bundle (`b`), an object of it by serialized file (`f`) and path ID (`o`), or an
+ * asset it makes (`a`).
+ */
+export type Place = { b?: string; f?: string; o?: string; a?: string };
 
 const text = (value: unknown) => (typeof value === "string" && value !== "" ? value : undefined);
 
@@ -20,6 +23,7 @@ const root = createRootRoute({
     b: text(search.b),
     f: text(search.f),
     o: text(search.o),
+    a: text(search.a),
   }),
   component: Root,
 });

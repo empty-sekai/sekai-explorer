@@ -1,6 +1,8 @@
-// The centre pane: the overview of the current bundle, or the inspector of the current object.
+// The centre pane: the overview of the current bundle, the inspector of the current object, or
+// the current asset.
 
 import { addressOf, useGo, usePlace } from "~/app/place";
+import { AssetView } from "~/asset/AssetView";
 import type { Catalog } from "~/core/catalog";
 import { m } from "~/paraglide/messages.js";
 import { cn } from "~/ui/ui";
@@ -14,7 +16,9 @@ export function Main({ catalog }: { catalog: Catalog }) {
   const bundle = place.b ? catalog.bundle(place.b) : undefined;
   const located = address && catalog.object(address);
 
-  const view = located ? (
+  const view = place.a ? (
+    <AssetView key={place.a} catalog={catalog} name={place.a} />
+  ) : located ? (
     <ObjectInspector key={place.o} catalog={catalog} located={located} />
   ) : bundle && !address ? (
     <BundleOverview catalog={catalog} bundle={bundle} />
@@ -25,12 +29,17 @@ export function Main({ catalog }: { catalog: Catalog }) {
   return (
     <section className="flex h-full min-h-0 flex-col bg-surface">
       <nav className="flex h-9 shrink-0 items-center gap-1 border-b border-line px-2">
-        <Tab active={!address} disabled={!bundle} onClick={() => bundle && go({ b: bundle.name })}>
+        <Tab
+          active={!address && !place.a}
+          disabled={!bundle}
+          onClick={() => bundle && go({ b: bundle.name })}
+        >
           {m.overview()}
         </Tab>
-        <Tab active={!!address} disabled={!located}>
+        <Tab active={!!address && !place.a} disabled={!located}>
           {m.inspector()}
         </Tab>
+        {place.a && <Tab active>{m.asset()}</Tab>}
       </nav>
       <div className="min-h-0 flex-1 overflow-auto">{view}</div>
     </section>
@@ -39,12 +48,12 @@ export function Main({ catalog }: { catalog: Catalog }) {
 
 function Tab({
   active,
-  disabled,
+  disabled = false,
   onClick,
   children,
 }: {
   active: boolean;
-  disabled: boolean;
+  disabled?: boolean;
   onClick?: () => void;
   children: string;
 }) {

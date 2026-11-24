@@ -1,9 +1,11 @@
-// The right pane: the identity of the current object or bundle, and what refers to it.
+// The right pane: the identity of the current object or bundle, the assets that start at the
+// object, and what refers to it.
 
 import { addressOf, placeOf, useGo, usePlace } from "~/app/place";
+import { AssetList } from "~/asset/AssetList";
 import { type Catalog, type Located, label } from "~/core/catalog";
 import { keyOf } from "~/core/documents";
-import { useReferrers } from "~/core/queries";
+import { useAssets, useReferrers } from "~/core/queries";
 import type { BundleSummary } from "~/core/session";
 import { bytes, count, short } from "~/lib/format";
 import { m } from "~/paraglide/messages.js";
@@ -68,7 +70,27 @@ function ObjectDetails({ catalog, located }: { catalog: Catalog; located: Locate
           </ul>
         </>
       )}
+      <PossibleAssets located={located} />
       <Referrers catalog={catalog} located={located} />
+    </>
+  );
+}
+
+/** The assets that start at the object. */
+function PossibleAssets({ located: { address } }: { located: Located }) {
+  const { data: assets = [] } = useAssets(address.bundle);
+  const rooted = assets.filter(
+    (asset) =>
+      asset.path_id === address.id && (asset.file === undefined || asset.file === address.file),
+  );
+  return (
+    <>
+      <SectionTitle>{m.possible_assets()}</SectionTitle>
+      {rooted.length === 0 ? (
+        <p className="text-ink-faint">{m.possible_assets_none()}</p>
+      ) : (
+        <AssetList bundle={address.bundle} assets={rooted} />
+      )}
     </>
   );
 }

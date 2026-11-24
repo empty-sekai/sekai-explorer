@@ -1,7 +1,11 @@
-// What a bundle holds: its entries, the classes of its objects, and the files it depends on.
+// What a bundle holds: its entries, the assets made from it, the classes of its objects, and the
+// files it depends on.
 
+import { LoaderCircle } from "lucide-react";
 import { useGo } from "~/app/place";
+import { AssetList } from "~/asset/AssetList";
 import type { Catalog } from "~/core/catalog";
+import { useAssets } from "~/core/queries";
 import type { BundleSummary } from "~/core/session";
 import { bytes, count } from "~/lib/format";
 import { m } from "~/paraglide/messages.js";
@@ -12,6 +16,7 @@ export function BundleOverview({ catalog, bundle }: { catalog: Catalog; bundle: 
     <div className="max-w-4xl space-y-2 p-4">
       <h1 className="break-all font-mono text-sm">{bundle.name}</h1>
       <Entries bundle={bundle} />
+      <Assets bundle={bundle.name} />
       <Classes bundle={bundle} />
       <Externals catalog={catalog} bundle={bundle} />
     </div>
@@ -44,6 +49,25 @@ function Entries({ bundle }: { bundle: BundleSummary }) {
           })}
         </tbody>
       </table>
+    </>
+  );
+}
+
+function Assets({ bundle }: { bundle: string }) {
+  const { data: assets } = useAssets(bundle);
+  return (
+    <>
+      <SectionTitle>
+        {m.assets()}
+        {assets && ` · ${count(assets.length)}`}
+      </SectionTitle>
+      {!assets ? (
+        <LoaderCircle className="size-4 animate-spin text-ink-faint" />
+      ) : assets.length === 0 ? (
+        <p className="text-ink-faint">{m.assets_none()}</p>
+      ) : (
+        <AssetList bundle={bundle} assets={assets} />
+      )}
     </>
   );
 }

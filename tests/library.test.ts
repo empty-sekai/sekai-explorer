@@ -3,14 +3,9 @@ import { Catalog } from "~/core/catalog";
 import { search } from "~/core/search";
 import { Session } from "~/core/session";
 import { rows } from "~/library/rows";
-import { model, shader } from "./fixtures";
+import { core, model, shader } from "./fixtures";
 
-const text = new TextEncoder();
-const session = Session.read((_n, _b, onFile) => {
-  for (const d of [model, shader])
-    onFile(`${d.bundle}/_objects.json`, text.encode(JSON.stringify(d)));
-  return "";
-}, []);
+const session = new Session(core([model, shader]));
 const catalog = new Catalog(session.library);
 
 test("lists closed bundles, and the objects of open ones", () => {

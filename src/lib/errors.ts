@@ -12,7 +12,14 @@ const OBJECT_ERRORS: Record<string, () => string> = {
   obfuscation: m.error_obfuscation,
 };
 
+const ASSET_ERRORS: Record<string, () => string> = {
+  not_compiled: m.error_not_compiled,
+  encoder_unavailable: m.error_encoder_unavailable,
+  too_large: m.error_too_large,
+  outside_dependencies: m.error_outside_dependencies,
+};
+
 /** The explanation of an error code, or the core's own words for one this list doesn't know. */
 export function explain(code: string): string {
-  return OBJECT_ERRORS[code]?.() ?? m.error_other({ reason: code });
+  return (OBJECT_ERRORS[code] ?? ASSET_ERRORS[code])?.() ?? m.error_other({ reason: code });
 }

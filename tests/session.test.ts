@@ -1,21 +1,8 @@
 import { expect, test } from "vitest";
-import type { ObjectDocument } from "~/core/documents";
-import { type ObjectsFunction, Session } from "~/core/session";
-import { model, shader } from "./fixtures";
+import { Session } from "~/core/session";
+import { core, model, shader } from "./fixtures";
 
-/** A stand-in for the core that writes the given documents and reports one failure. */
-function core(documents: ObjectDocument[]): ObjectsFunction {
-  const text = new TextEncoder();
-  return (_names, _bundles, onFile) => {
-    for (const document of documents) {
-      onFile(`${document.bundle}/_objects.json`, text.encode(JSON.stringify(document)));
-    }
-    onFile("_payloads/ab/abcd.bin", new Uint8Array([1, 2, 3]));
-    return "broken\tobfuscation\n";
-  };
-}
-
-const session = Session.read(core([model, shader]), []);
+const session = new Session(core([model, shader], [["broken", "obfuscation"]]));
 
 test("summarises bundles without their fields", () => {
   const [bundle] = session.library.bundles;
@@ -39,4 +26,9 @@ test("finds who refers to an object, across bundles, with the field", () => {
 
 test("keeps payloads by hash", () => {
   expect(session.payload("abcd")).toEqual(new Uint8Array([1, 2, 3]));
+});
+
+test("lists the assets a bundle plans", () => {
+  expect(session.assets("model")).toEqual([{ name: "a/b", form: "texture", path_id: "1" }]);
+  expect(session.convert("a/b")).toBeNull();
 });

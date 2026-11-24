@@ -1,5 +1,5 @@
-// The bundles of one exploration, read by the core, and the questions the interface asks about
-// them. It runs in the core's worker.
+// The bundles of one exploration, held open by the core, and the questions the interface asks
+// about them. It runs in the core's worker.
 
 import {
   type Address,
@@ -43,48 +43,65 @@ export type Library = { bundles: BundleSummary[]; failures: Failure[] };
 /** An object that refers to another, and the field it does so in. */
 export type Referrer = { from: Address; field: string };
 
-export type Bundle = { name: string; bytes: Uint8Array };
+/** An asset a bundle plans: its name, its form, and the object or file it starts at. */
+export type PlannedAsset = { name: string; form: string; path_id?: string; file?: string };
 
-/** The `objects` function of the core: object documents of bundles given as names and bytes. */
-export type ObjectsFunction = (
-  names: string[],
-  bundles: Uint8Array[],
-  onFile: (path: string, bytes: Uint8Array) => void,
-) => string;
+/** An object an asset is made from, as asset documents list it. */
+export type SourceObject = { bundle: string; file?: string; path_id: string; class: string };
 
-const DOCUMENT = "/_objects.json";
+/** A file of an asset. */
+export type Member = {
+  role: string;
+  sha256: string;
+  size: number;
+  extension: string;
+  media_type?: string;
+};
+
+/** What an asset is, as the core writes it once it has converted the asset. */
+export type AssetDocument = {
+  name: string;
+  form: string;
+  form_version: number;
+  fingerprint: string;
+  sources: SourceObject[];
+  resources?: { bundle: string; file: string }[];
+  members: Member[];
+  references: string[];
+  error?: { code: string; message: string };
+};
+
+/** The core's session over a set of bundles, as its class `Explorer` offers it. */
+export type Explorer = {
+  bundles(): string[];
+  failed(): string;
+  document(bundle: string, onPayload: (sha256: string, bytes: Uint8Array) => void): Uint8Array;
+  assets(bundle: string): string;
+  convert(name: string): Uint8Array | undefined;
+  closure(name: string): string | undefined;
+  file(name: string): Uint8Array;
+};
+
+const text = new TextDecoder();
+const json = <T>(bytes: Uint8Array): T => JSON.parse(text.decode(bytes));
 
 export class Session {
   readonly library: Library;
+  readonly #core: Explorer;
   readonly #objects = new Map<string, UnityObject>();
   readonly #referrers = new Map<string, Referrer[]>();
-  readonly #payloads: Map<string, Uint8Array>;
+  readonly #payloads = new Map<string, Uint8Array>();
 
-  /** Reads `bundles` with the core's `objects` function. */
-  static read(objects: ObjectsFunction, bundles: Bundle[]): Session {
-    const documents: ObjectDocument[] = [];
-    const payloads = new Map<string, Uint8Array>();
-    const text = new TextDecoder();
-    const failed = objects(
-      bundles.map((bundle) => bundle.name),
-      bundles.map((bundle) => bundle.bytes),
-      (path, bytes) => {
-        if (path.endsWith(DOCUMENT)) {
-          documents.push(JSON.parse(text.decode(bytes)));
-        } else {
-          payloads.set(path.slice(path.lastIndexOf("/") + 1, -".bin".length), bytes);
-        }
-      },
-    );
-    return new Session(documents, payloads, failures(failed));
-  }
-
-  private constructor(
-    documents: ObjectDocument[],
-    payloads: Map<string, Uint8Array>,
-    failures: Failure[],
-  ) {
-    this.#payloads = payloads;
+  /** Reads the object document of every bundle `core` holds. */
+  constructor(core: Explorer) {
+    this.#core = core;
+    const documents = core
+      .bundles()
+      .map((bundle) =>
+        json<ObjectDocument>(
+          core.document(bundle, (sha256, bytes) => this.#payloads.set(sha256, bytes)),
+        ),
+      );
     for (const document of documents) {
       for (const file of document.files) {
         for (const object of file.objects) {
@@ -94,7 +111,11 @@ export class Session {
         }
       }
     }
-    this.library = { bundles: documents.map(summary), failures };
+    const failures: [string, string][] = JSON.parse(core.failed());
+    this.library = {
+      bundles: documents.map(summary),
+      failures: failures.map(([bundle, reason]) => ({ bundle, reason })),
+    };
   }
 
   object(address: Address): UnityObject | undefined {
@@ -108,6 +129,27 @@ export class Session {
   /** A byte payload too large to be written inline, by its SHA-256. */
   payload(sha256: string): Uint8Array | undefined {
     return this.#payloads.get(sha256);
+  }
+
+  assets(bundle: string): PlannedAsset[] {
+    return JSON.parse(this.#core.assets(bundle));
+  }
+
+  /** The asset `name`, converted if it has not been; `null` when its root holds none. */
+  convert(name: string): AssetDocument | null {
+    const document = this.#core.convert(name);
+    return document ? json(document) : null;
+  }
+
+  /** The objects converting the asset `name` may read, its root first. */
+  closure(name: string): SourceObject[] {
+    const closure = this.#core.closure(name);
+    return closure ? JSON.parse(closure) : [];
+  }
+
+  /** A file of a converted asset. */
+  member(member: Member): Uint8Array {
+    return this.#core.file(`${member.sha256}.${member.extension}`);
   }
 
   #index(from: Address, object: UnityObject) {
@@ -145,15 +187,4 @@ function summary(document: ObjectDocument): BundleSummary {
       })),
     })),
   };
-}
-
-/** The failures the core reports, one `<bundle>\t<reason>` line each. */
-function failures(lines: string): Failure[] {
-  return lines
-    .split("\n")
-    .filter((line) => line !== "")
-    .map((line) => {
-      const tab = line.indexOf("\t");
-      return { bundle: line.slice(0, tab), reason: line.slice(tab + 1) };
-    });
 }

@@ -1,34 +1,45 @@
-// The worker that runs the WebAssembly core, so that reading bundles never blocks the page.
+// The worker that runs the WebAssembly core, so that reading bundles never blocks the page. The
+// core reads the chosen files synchronously, a range at a time, which only a worker can do.
 
 import * as Comlink from "comlink";
 import type { Address } from "./documents";
-import initialize, { objects } from "./package/sekai_wasm.js";
-import { Session } from "./session";
+import initialize, { Explorer } from "./package/sekai_wasm.js";
+import { type Member, Session } from "./session";
 
 /** A bundle chosen by the user: its name and the file that holds it. */
 export type Source = { name: string; file: File };
 
 const ready = initialize();
+let explorer: Explorer | undefined;
 let session: Session | undefined;
 
+/** `bytes` handed over to the page, without a copy left behind. */
+const handed = (bytes: Uint8Array) => Comlink.transfer(bytes, [bytes.buffer]);
+
 const api = {
-  /** Reads `sources` and makes them the bundles of the session. */
+  /** Opens `sources` as the bundles of the session. */
   async open(sources: Source[]) {
     await ready;
-    const bundles = await Promise.all(
-      sources.map(async ({ name, file }) => ({
-        name,
-        bytes: new Uint8Array(await file.arrayBuffer()),
-      })),
+    explorer?.free();
+    explorer = new Explorer(
+      sources.map((source) => source.name),
+      sources.map((source) => source.file),
     );
-    session = Session.read(objects, bundles);
+    session = new Session(explorer);
     return session.library;
   },
   object: (address: Address) => session?.object(address),
   referrers: (address: Address) => session?.referrers(address) ?? [],
   payload(sha256: string) {
     const copy = session?.payload(sha256)?.slice();
-    return copy && Comlink.transfer(copy, [copy.buffer]);
+    return copy && handed(copy);
+  },
+  assets: (bundle: string) => session?.assets(bundle) ?? [],
+  convert: (name: string) => session?.convert(name) ?? null,
+  closure: (name: string) => session?.closure(name) ?? [],
+  member(member: Member) {
+    const bytes = session?.member(member);
+    return bytes && handed(bytes);
   },
 };
 

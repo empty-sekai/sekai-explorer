@@ -33,7 +33,7 @@ export function BytesView({ bytes: { $bytes } }: { bytes: Bytes }) {
   );
 }
 
-function Hex({ data }: { data: Uint8Array }) {
+export function Hex({ data }: { data: Uint8Array }) {
   const offsets = Array.from({ length: Math.ceil(data.length / ROW) }, (_, i) => i * ROW);
   return (
     <pre className="mt-1 max-h-72 overflow-auto rounded-md border border-line bg-canvas p-2 leading-4">

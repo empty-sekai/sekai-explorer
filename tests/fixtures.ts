@@ -2,6 +2,7 @@
 // material of another bundle.
 
 import type { ObjectDocument, SerializedFile, UnityObject } from "~/core/documents";
+import type { Explorer } from "~/core/session";
 
 const object = (
   id: string,
@@ -71,3 +72,21 @@ export const shader: ObjectDocument = {
   entries: [{ path: "CAB-b", kind: "serialized", size: 50, sha256: "22".repeat(32) }],
   files: [file("CAB-b", [object("9", "Material", { m_Name: "skin" }, "skin")])],
 };
+
+/** A stand-in for the core's session over `documents`, with one payload and the given failures. */
+export function core(documents: ObjectDocument[], failures: [string, string][] = []): Explorer {
+  const text = new TextEncoder();
+  return {
+    bundles: () => documents.map((document) => document.bundle),
+    failed: () => JSON.stringify(failures),
+    document(bundle, onPayload) {
+      onPayload("abcd", new Uint8Array([1, 2, 3]));
+      const document = documents.find((d) => d.bundle === bundle);
+      return text.encode(JSON.stringify(document));
+    },
+    assets: () => JSON.stringify([{ name: "a/b", form: "texture", path_id: "1" }]),
+    convert: () => undefined,
+    closure: () => undefined,
+    file: () => new Uint8Array(),
+  };
+}
