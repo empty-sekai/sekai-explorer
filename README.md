@@ -12,6 +12,7 @@ It isn't clear yet what this project is useful for, but it can:
 - read every field of an object, in stored order, with references as links to the objects they point to, across bundles;
 - see which objects refer to an object, and through which field;
 - see which assets a bundle or an object can be made into, convert them in the browser, and preview their files (images, sound, video, text and 3D models) next to the objects the conversion read;
+- draw the objects around an object, as many references away as asked, as a graph, and the objects an asset could be made from, with those its conversion read set apart;
 - open byte payloads as hex;
 - jump anywhere with <kbd>Ctrl</kbd> <kbd>K</kbd>, and go back and forward; the URL names the current bundle and object.
 

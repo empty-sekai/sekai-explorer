@@ -12,6 +12,7 @@
   "can_fields": "show every field of an object, with references as links across bundles",
   "can_referrers": "show which objects refer to an object, and through which field",
   "can_assets": "see which assets a bundle or object can become, convert them here, and preview images, sound, video, text and 3D models",
+  "can_graph": "draw the objects around an object, and the objects an asset is made from, as a graph",
   "can_bytes": "open byte payloads as hex",
   "can_jump": "jump anywhere with Ctrl K; back, forward and the URL keep your place",
   "open_files": "Choose files",
@@ -175,5 +176,15 @@
   "error_not_compiled": "This form is not part of this build of the core.",
   "error_encoder_unavailable": "The encoder this asset needs is not available in the browser.",
   "error_too_large": "This asset would need more memory than the browser allows.",
-  "error_outside_dependencies": "It refers to objects in bundles that are not open."
+  "error_outside_dependencies": "It refers to objects in bundles that are not open.",
+  "graph": "Graph",
+  "graph_depth": "Depth",
+  "graph_truncated": "Only the nearest objects are shown.",
+  "graph_hide": "Click a class to hide or show it.",
+  "graph_show": "Show as a graph",
+  "graph_list": "Show as a list",
+  "graph_too_large": "Too many objects to draw.",
+  "graph_read": "Read",
+  "graph_unread": "Not read",
+  "graph_alone": "Nothing refers to this object, and it refers to nothing."
 }

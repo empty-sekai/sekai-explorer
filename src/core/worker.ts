@@ -30,6 +30,9 @@ const api = {
   },
   object: (address: Address) => session?.object(address),
   referrers: (address: Address) => session?.referrers(address) ?? [],
+  near: (center: Address, depth: number, limit: number) =>
+    session?.near(center, depth, limit) ?? { objects: [], links: [], truncated: false },
+  among: (objects: Address[]) => session?.among(objects) ?? [],
   payload(sha256: string) {
     const copy = session?.payload(sha256)?.slice();
     return copy && handed(copy);

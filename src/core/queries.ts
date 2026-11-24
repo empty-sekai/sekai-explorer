@@ -50,3 +50,20 @@ export function useMember(member: Member) {
     queryFn: async () => (await core.member(member)) ?? null,
   });
 }
+
+/** The objects at most `depth` references from `center`, either way. */
+export function useNear(center: Address, depth: number, limit: number) {
+  return useQuery({
+    queryKey: ["near", keyOf(center), depth, limit],
+    queryFn: () => core.near(center, depth, limit),
+  });
+}
+
+/** The references among `objects`, fetched only when `wanted`. */
+export function useAmong(objects: Address[], wanted: boolean) {
+  return useQuery({
+    queryKey: ["among", objects.map(keyOf)],
+    queryFn: () => core.among(objects),
+    enabled: wanted,
+  });
+}

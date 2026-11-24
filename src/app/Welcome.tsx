@@ -13,6 +13,7 @@ const abilities = [
   m.can_fields,
   m.can_referrers,
   m.can_assets,
+  m.can_graph,
   m.can_bytes,
   m.can_jump,
 ];

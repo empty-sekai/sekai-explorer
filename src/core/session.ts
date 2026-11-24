@@ -11,6 +11,7 @@ import {
   resolve,
   type UnityObject,
 } from "./documents";
+import { type Graph, type Link, Links } from "./links";
 
 /** What the library lists about an object: everything but its fields. */
 export type ObjectSummary = {
@@ -39,9 +40,6 @@ export type BundleSummary = { name: string; entries: Entry[]; files: FileSummary
 export type Failure = { bundle: string; reason: string };
 
 export type Library = { bundles: BundleSummary[]; failures: Failure[] };
-
-/** An object that refers to another, and the field it does so in. */
-export type Referrer = { from: Address; field: string };
 
 /** An asset a bundle plans: its name, its form, and the object or file it starts at. */
 export type PlannedAsset = { name: string; form: string; path_id?: string; file?: string };
@@ -89,7 +87,7 @@ export class Session {
   readonly library: Library;
   readonly #core: Explorer;
   readonly #objects = new Map<string, UnityObject>();
-  readonly #referrers = new Map<string, Referrer[]>();
+  readonly #links = new Links();
   readonly #payloads = new Map<string, Uint8Array>();
 
   /** Reads the object document of every bundle `core` holds. */
@@ -122,8 +120,19 @@ export class Session {
     return this.#objects.get(keyOf(address));
   }
 
-  referrers(address: Address): Referrer[] {
-    return this.#referrers.get(keyOf(address)) ?? [];
+  /** The references made to `address`. */
+  referrers(address: Address): Link[] {
+    return this.#links.to(address);
+  }
+
+  /** The objects at most `depth` references from `center`, either way, at most `limit`. */
+  near(center: Address, depth: number, limit: number): Graph {
+    return this.#links.near(center, depth, limit);
+  }
+
+  /** The references among `objects`. */
+  among(objects: Address[]): Link[] {
+    return this.#links.among(objects);
   }
 
   /** A byte payload too large to be written inline, by its SHA-256. */
@@ -157,10 +166,7 @@ export class Session {
     for (const [field, reference] of references(object.fields)) {
       const target = resolve(reference, from);
       if (!("address" in target)) continue;
-      const key = keyOf(target.address);
-      const list = this.#referrers.get(key);
-      if (list) list.push({ from, field });
-      else this.#referrers.set(key, [{ from, field }]);
+      this.#links.add({ from, to: target.address, field });
     }
   }
 }

@@ -12,6 +12,7 @@
   "can_fields": "读对象的每个字段，引用是可以跨包跳转的链接",
   "can_referrers": "查看哪些对象引用了某个对象，经由哪个字段",
   "can_assets": "查看包和对象能做成哪些资产，在这里转换，并预览图片、声音、视频、文本和 3D 模型",
+  "can_graph": "把一个对象周围的对象、一个资产取材的对象画成图",
   "can_bytes": "以十六进制查看字节负载",
   "can_jump": "用 Ctrl K 跳到任何地方；前进、后退和 URL 记住当前位置",
   "open_files": "选择文件",
@@ -171,5 +172,15 @@
   "error_not_compiled": "这个形式没有编译进当前的核心。",
   "error_encoder_unavailable": "这个资产需要的编码器在浏览器里不可用。",
   "error_too_large": "这个资产需要的内存超过了浏览器的上限。",
-  "error_outside_dependencies": "它引用了未打开的包里的对象。"
+  "error_outside_dependencies": "它引用了未打开的包里的对象。",
+  "graph": "图",
+  "graph_depth": "深度",
+  "graph_truncated": "只显示最近的一部分对象。",
+  "graph_hide": "点击类名隐藏或显示这一类。",
+  "graph_show": "以图显示",
+  "graph_list": "以列表显示",
+  "graph_too_large": "对象太多，画不下。",
+  "graph_read": "已读取",
+  "graph_unread": "未读取",
+  "graph_alone": "没有对象引用它，它也不引用别的对象。"
 }

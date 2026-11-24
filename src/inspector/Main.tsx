@@ -1,13 +1,17 @@
-// The centre pane: the overview of the current bundle, the inspector of the current object, or
-// the current asset.
+// The centre pane: the overview of the current bundle, the inspector of the current object or
+// the graph around it, or the current asset.
 
-import { addressOf, useGo, usePlace } from "~/app/place";
+import { LoaderCircle } from "lucide-react";
+import { lazy, Suspense } from "react";
+import { addressOf, placeOf, useGo, usePlace } from "~/app/place";
 import { AssetView } from "~/asset/AssetView";
 import type { Catalog } from "~/core/catalog";
 import { m } from "~/paraglide/messages.js";
 import { cn } from "~/ui/ui";
 import { BundleOverview } from "./BundleOverview";
 import { ObjectInspector } from "./ObjectInspector";
+
+const NearGraph = lazy(() => import("~/graph/NearGraph"));
 
 export function Main({ catalog }: { catalog: Catalog }) {
   const place = usePlace();
@@ -18,6 +22,10 @@ export function Main({ catalog }: { catalog: Catalog }) {
 
   const view = place.a ? (
     <AssetView key={place.a} catalog={catalog} name={place.a} />
+  ) : located && place.g ? (
+    <Suspense fallback={<LoaderCircle className="m-8 size-4 animate-spin text-ink-soft" />}>
+      <NearGraph catalog={catalog} center={located.address} />
+    </Suspense>
   ) : located ? (
     <ObjectInspector key={place.o} catalog={catalog} located={located} />
   ) : bundle && !address ? (
@@ -36,8 +44,19 @@ export function Main({ catalog }: { catalog: Catalog }) {
         >
           {m.overview()}
         </Tab>
-        <Tab active={!!address && !place.a} disabled={!located}>
+        <Tab
+          active={!!address && !place.a && !place.g}
+          disabled={!located}
+          onClick={() => address && go(placeOf(address))}
+        >
           {m.inspector()}
+        </Tab>
+        <Tab
+          active={!!address && !place.a && !!place.g}
+          disabled={!located}
+          onClick={() => address && go({ ...placeOf(address), g: "1" })}
+        >
+          {m.graph()}
         </Tab>
         {place.a && <Tab active>{m.asset()}</Tab>}
       </nav>

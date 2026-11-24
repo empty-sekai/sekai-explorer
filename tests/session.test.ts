@@ -14,13 +14,25 @@ test("summarises bundles without their fields", () => {
   expect(session.library.failures).toEqual([{ bundle: "broken", reason: "obfuscation" }]);
 });
 
+const body = (id: string) => ({ bundle: "model/body", file: "CAB-a", id });
+const material = { bundle: "shader/common", file: "CAB-b", id: "9" };
+
 test("finds who refers to an object, across bundles, with the field", () => {
-  expect(session.referrers({ bundle: "model/body", file: "CAB-a", id: "1" })).toEqual([
-    { from: { bundle: "model/body", file: "CAB-a", id: "2" }, field: "m_GameObject" },
-    { from: { bundle: "model/body", file: "CAB-a", id: "3" }, field: "m_GameObject" },
+  expect(session.referrers(body("1"))).toEqual([
+    { from: body("2"), to: body("1"), field: "m_GameObject" },
+    { from: body("3"), to: body("1"), field: "m_GameObject" },
   ]);
-  expect(session.referrers({ bundle: "shader/common", file: "CAB-b", id: "9" })).toEqual([
-    { from: { bundle: "model/body", file: "CAB-a", id: "3" }, field: "m_Materials[0]" },
+  expect(session.referrers(material)).toEqual([
+    { from: body("3"), to: material, field: "m_Materials[0]" },
+  ]);
+});
+
+test("draws the objects near one, and the references among a set", () => {
+  const near = session.near(material, 2, 100);
+  expect(near.objects).toEqual([material, body("3"), body("1")]);
+  expect(near.truncated).toBe(false);
+  expect(session.among([body("3"), material]).map((link) => link.field)).toEqual([
+    "m_Materials[0]",
   ]);
 });
 

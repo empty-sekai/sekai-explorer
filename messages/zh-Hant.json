@@ -12,6 +12,7 @@
   "can_fields": "讀物件的每個欄位，參照是可以跨包跳轉的連結",
   "can_referrers": "查看哪些物件參照了某個物件，經由哪個欄位",
   "can_assets": "查看包和物件能做成哪些資產，在這裡轉換，並預覽圖片、聲音、影片、文字和 3D 模型",
+  "can_graph": "把一個物件周圍的物件、一個資產取材的物件畫成圖",
   "can_bytes": "以十六進位檢視位元組負載",
   "can_jump": "用 Ctrl K 跳到任何地方；前進、後退和 URL 記住目前位置",
   "open_files": "選擇檔案",
@@ -171,5 +172,15 @@
   "error_not_compiled": "這個形式沒有編譯進目前的核心。",
   "error_encoder_unavailable": "這個資產需要的編碼器在瀏覽器裡不可用。",
   "error_too_large": "這個資產需要的記憶體超過了瀏覽器的上限。",
-  "error_outside_dependencies": "它參照了未開啟的包裡的物件。"
+  "error_outside_dependencies": "它參照了未開啟的包裡的物件。",
+  "graph": "圖",
+  "graph_depth": "深度",
+  "graph_truncated": "只顯示最近的一部分物件。",
+  "graph_hide": "點擊類別名稱隱藏或顯示這一類。",
+  "graph_show": "以圖顯示",
+  "graph_list": "以列表顯示",
+  "graph_too_large": "物件太多，畫不下。",
+  "graph_read": "已讀取",
+  "graph_unread": "未讀取",
+  "graph_alone": "沒有物件參照它，它也不參照別的物件。"
 }

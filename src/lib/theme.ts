@@ -24,11 +24,18 @@ function apply() {
 dark.addEventListener("change", apply);
 apply();
 
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
 export function useTheme(): Theme {
-  return useSyncExternalStore((listener) => {
-    listeners.add(listener);
-    return () => listeners.delete(listener);
-  }, stored);
+  return useSyncExternalStore(subscribe, stored);
+}
+
+/** Whether the page is drawn dark, by choice or by following the system. */
+export function useDark(): boolean {
+  return useSyncExternalStore(subscribe, () => document.documentElement.classList.contains("dark"));
 }
 
 export function changeTheme(theme: Theme) {

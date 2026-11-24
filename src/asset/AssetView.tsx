@@ -2,7 +2,7 @@
 // objects it was made from next to those it could have read.
 
 import { LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { placeOf, useGo } from "~/app/place";
 import { type Catalog, label } from "~/core/catalog";
 import { useClosure, useConverted } from "~/core/queries";
@@ -13,6 +13,8 @@ import { m } from "~/paraglide/messages.js";
 import { ClassDot, CopyButton, cn, Fact, SectionTitle } from "~/ui/ui";
 import { FormBadge } from "./AssetList";
 import { MemberPreview } from "./MemberPreview";
+
+const ClosureGraph = lazy(() => import("~/graph/ClosureGraph"));
 
 export function AssetView({ catalog, name }: { catalog: Catalog; name: string }) {
   const { data: document, isPending, error } = useConverted(name);
@@ -121,17 +123,51 @@ function References({ catalog, references }: { catalog: Catalog; references: str
   );
 }
 
-/** The objects the conversion read, then those it could have read and did not. */
+/**
+ * The objects the conversion read, then those it could have read and did not, as lists or as one
+ * graph.
+ */
 function Sources({ catalog, document }: { catalog: Catalog; document: AssetDocument }) {
   const { data: closure = [] } = useClosure(document.name);
+  const [graph, setGraph] = useState(false);
   const read = new Set(document.sources.map(nameKey));
   const unread = closure.filter((object) => !read.has(nameKey(object)));
+  if (document.sources.length + unread.length === 0) return null;
+  const toggle = (
+    <button
+      type="button"
+      onClick={() => setGraph(!graph)}
+      className="ms-2 font-normal text-accent hover:underline"
+    >
+      {graph ? m.graph_list() : m.graph_show()}
+    </button>
+  );
+  if (graph) {
+    return (
+      <>
+        <SectionTitle>
+          {m.sources_read()} · {count(document.sources.length)} · {m.closure_unread()} ·{" "}
+          {count(unread.length)}
+          {toggle}
+        </SectionTitle>
+        <Suspense fallback={<LoaderCircle className="size-4 animate-spin text-ink-soft" />}>
+          <ClosureGraph
+            catalog={catalog}
+            read={document.sources}
+            unread={unread}
+            home={catalog.bundleOf(document.name) ?? ""}
+          />
+        </Suspense>
+      </>
+    );
+  }
   return (
     <>
       {document.sources.length > 0 && (
         <>
           <SectionTitle>
             {m.sources_read()} · {count(document.sources.length)}
+            {toggle}
           </SectionTitle>
           <ObjectList catalog={catalog} objects={document.sources} />
         </>
@@ -140,6 +176,7 @@ function Sources({ catalog, document }: { catalog: Catalog; document: AssetDocum
         <>
           <SectionTitle>
             {m.closure_unread()} · {count(unread.length)}
+            {document.sources.length === 0 && toggle}
           </SectionTitle>
           <ObjectList catalog={catalog} objects={unread} />
         </>
