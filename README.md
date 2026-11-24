@@ -1,0 +1,57 @@
+# Sekai Explorer
+
+English | [简体中文](README.zh-CN.md)
+
+Read the objects inside the game's Unity bundles, right in your browser.
+
+> **Experimental.** This project is an experiment in what exploring bundles in a browser can be. It may change a lot or be dropped, and its interface and URLs make no compatibility promises.
+
+## What it does
+
+Open bundles, or a whole folder of them, and the explorer reads them with the WebAssembly build of [sekai-exporter](https://github.com/StarMoe-org/sekai-exporter)'s core. Then you can:
+
+- browse every bundle and its objects, filtered by name, class or path ID;
+- see a bundle's entries, the classes of its objects, and the bundles its external files resolve to;
+- read every field of an object, in stored order, with references as links to the objects they point to, across bundles;
+- see which objects refer to an object, and through which field;
+- open byte payloads as hex;
+- jump anywhere with <kbd>Ctrl</kbd> <kbd>K</kbd>, and go back and forward; the URL names the current bundle and object.
+
+Files are read in the browser and never uploaded. The site holds no game data.
+
+Objects are shown as the [object document format](https://github.com/StarMoe-org/sekai-exporter/blob/main/docs/spec/object-documents.md) of sekai-exporter describes them.
+
+The interface is in English, 简体中文, 繁體中文 and 日本語.
+
+## Development
+
+You need [Bun](https://bun.sh), and to build the core, Rust with the `wasm32-unknown-unknown` target and the `wasm-bindgen` CLI of the version in `core.lock.json`.
+
+Build the core from the sekai-exporter revision in `core.lock.json`:
+
+```bash
+cargo build --release -p sekai-wasm --target wasm32-unknown-unknown
+wasm-bindgen --target web --out-dir <core> target/wasm32-unknown-unknown/release/sekai_wasm.wasm
+```
+
+Then, in this repository:
+
+```bash
+bun install
+SEKAI_CORE_DIR=<core> bun run core
+bun run dev
+```
+
+| Command         | What it does                                        |
+| --------------- | --------------------------------------------------- |
+| `bun run dev`   | Starts the development server                       |
+| `bun run build` | Type-checks and builds the static site into `dist/` |
+| `bun run test`  | Runs the unit tests, which use synthetic data only  |
+| `bun run check` | Checks formatting and lints with Biome              |
+| `bun run i18n`  | Checks that every language has every message        |
+
+Messages live in `messages/<locale>.json`. Interface text always comes from there; numbers, sizes and plurals are formatted with `Intl` for the current language.
+
+## License
+
+[MIT](LICENSE)

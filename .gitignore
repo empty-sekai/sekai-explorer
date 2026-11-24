@@ -1,0 +1,11 @@
+node_modules/
+dist/
+src/paraglide/
+src/core/package/
+project.inlang/cache/
+project.inlang/.gitignore
+project.inlang/README.md
+*.log
+.wrangler/
+core-source/
+core-package/

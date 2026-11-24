@@ -1,0 +1,47 @@
+{
+  "name": "sekai-explorer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "core": "bun scripts/core.ts",
+    "dev": "vite",
+    "build": "bun run typecheck && vite build",
+    "preview": "vite preview",
+    "check": "biome check .",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "i18n": "bun scripts/check-messages.ts",
+    "messages": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
+    "typecheck": "bun run messages && tsc -p tsconfig.json && tsc -p tsconfig.node.json"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.9.0",
+    "@tanstack/react-query": "^5.108.4",
+    "@tanstack/react-router": "^1.170.46",
+    "@tanstack/react-virtual": "^3.14.28",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "comlink": "^4.4.2",
+    "lucide-react": "^1.78.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-resizable-panels": "^4.24.1",
+    "tailwind-merge": "^3.7.1",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.8",
+    "@inlang/paraglide-js": "^3.2.2",
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/bun": "^1.4.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "oxc-transform-react": "^0.158.0",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
+  }
+}

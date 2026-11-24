@@ -1,0 +1,139 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "Sekai Explorer",
+  "app_tagline": "ゲームの Unity バンドルの中のオブジェクトを、ブラウザでそのまま読めます。",
+  "welcome_title": "バンドルを開いて探索する",
+  "welcome_body": "バンドルやフォルダーをここにドロップするか、下から選んでください。ファイルはこのブラウザ内で読み込まれ、アップロードされません。",
+  "welcome_drop": "ドロップして開く",
+  "experimental": "試験的",
+  "open_files": "ファイルを選ぶ",
+  "open_folder": "フォルダーを選ぶ",
+  "reading": "バンドルを読み込んでいます…",
+  "read_failed": "バンドルを読み込めませんでした：{reason}",
+  "bundle_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 個のバンドル"
+      }
+    }
+  ],
+  "object_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 個のオブジェクト"
+      }
+    }
+  ],
+  "failure_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 個は読み込めません"
+      }
+    }
+  ],
+  "search": "検索",
+  "search_placeholder": "バンドル、オブジェクト名、クラス、コンテナパス、path ID",
+  "search_empty": "一致するものはありません",
+  "search_bundles": "バンドル",
+  "search_objects": "オブジェクト",
+  "back": "戻る",
+  "forward": "進む",
+  "theme": "テーマ",
+  "theme_system": "システム",
+  "theme_light": "ライト",
+  "theme_dark": "ダーク",
+  "language": "言語",
+  "library": "ライブラリ",
+  "library_filter": "バンドルとオブジェクトを絞り込む",
+  "unreadable_bundles": "読み込めないバンドル",
+  "overview": "概要",
+  "inspector": "インスペクター",
+  "details": "詳細",
+  "nothing_selected": "ライブラリからバンドルかオブジェクトを選んでください。",
+  "not_found": "開いているバンドルにこの場所はありません。同じバンドルを開くと戻れます。",
+  "entries": "エントリ",
+  "entry_serialized": "シリアライズファイル",
+  "entry_resource": "リソース",
+  "classes": "クラス",
+  "externals": "外部ファイル",
+  "external_builtin": "エンジン組み込み",
+  "external_not_open": "未オープン",
+  "unity_version": "Unity バージョン",
+  "serialized_version": "フォーマットバージョン",
+  "type_trees": "タイプツリー",
+  "yes": "あり",
+  "no": "なし",
+  "class": "クラス",
+  "class_id": "クラス ID",
+  "script": "スクリプト",
+  "script_unresolved": "未解決",
+  "path_id": "Path ID",
+  "bundle": "バンドル",
+  "file": "ファイル",
+  "container": "コンテナパス",
+  "size": "サイズ",
+  "referenced_by": "参照元",
+  "referenced_by_none": "開いているオブジェクトから参照されていません。",
+  "filter_fields": "フィールドを絞り込む",
+  "show_more": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "さらに {countText} 件表示"
+      }
+    }
+  ],
+  "item_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 件"
+      }
+    }
+  ],
+  "bytes_inline": "バイトを表示",
+  "bytes_hide": "バイトを隠す",
+  "copy": "コピー",
+  "copied": "コピーしました",
+  "copy_json": "JSON をコピー",
+  "object_error": "このオブジェクトは正確に読み込めませんでした",
+  "raw_bytes": "格納バイト",
+  "error_no_layout": "ファイルにこのクラスのタイプツリーがなく、レイアウト表にもありません。",
+  "error_truncated": "レイアウトがオブジェクトの終わりを越えて読み込みます。",
+  "error_trailing_bytes": "レイアウトがオブジェクトの終わりより前に終わります。",
+  "error_invalid_layout": "レイアウトを解釈できません。",
+  "error_malformed": "格納された値がファイルと矛盾しています。",
+  "error_unresolved_reference_type": "マネージド参照がファイルにない型を指しています。",
+  "error_obfuscation": "このバンドルのヘッダーは未対応です。",
+  "error_other": "コアの報告：{reason}",
+  "about_privacy": "すべてローカルで動作し、何もアップロードしません。",
+  "objects": "オブジェクト"
+}

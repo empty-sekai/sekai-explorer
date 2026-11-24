@@ -1,0 +1,143 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "Sekai Explorer",
+  "app_tagline": "Read the objects inside the game's Unity bundles, right in your browser.",
+  "welcome_title": "Open bundles to explore",
+  "welcome_body": "Drop bundles or a folder here, or choose them below. Files are read in this browser and never uploaded.",
+  "welcome_drop": "Drop to open",
+  "experimental": "Experimental",
+  "open_files": "Choose files",
+  "open_folder": "Choose folder",
+  "reading": "Reading bundles…",
+  "read_failed": "The bundles couldn't be read: {reason}",
+  "bundle_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} bundle",
+        "countPlural=other": "{countText} bundles"
+      }
+    }
+  ],
+  "object_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} object",
+        "countPlural=other": "{countText} objects"
+      }
+    }
+  ],
+  "failure_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} unreadable",
+        "countPlural=other": "{countText} unreadable"
+      }
+    }
+  ],
+  "search": "Search",
+  "search_placeholder": "Bundle, object name, class, container path or path ID",
+  "search_empty": "No matches",
+  "search_bundles": "Bundles",
+  "search_objects": "Objects",
+  "back": "Back",
+  "forward": "Forward",
+  "theme": "Theme",
+  "theme_system": "System",
+  "theme_light": "Light",
+  "theme_dark": "Dark",
+  "language": "Language",
+  "library": "Library",
+  "library_filter": "Filter bundles and objects",
+  "unreadable_bundles": "Unreadable bundles",
+  "overview": "Overview",
+  "inspector": "Inspector",
+  "details": "Details",
+  "nothing_selected": "Pick a bundle or an object in the library.",
+  "not_found": "This place isn't among the open bundles. Open the same bundles to come back to it.",
+  "entries": "Entries",
+  "entry_serialized": "Serialized file",
+  "entry_resource": "Resource",
+  "classes": "Classes",
+  "externals": "External files",
+  "external_builtin": "Engine built-in",
+  "external_not_open": "Not open",
+  "unity_version": "Unity version",
+  "serialized_version": "Format version",
+  "type_trees": "Type trees",
+  "yes": "Yes",
+  "no": "No",
+  "class": "Class",
+  "class_id": "Class ID",
+  "script": "Script",
+  "script_unresolved": "Unresolved",
+  "path_id": "Path ID",
+  "bundle": "Bundle",
+  "file": "File",
+  "container": "Container paths",
+  "size": "Size",
+  "referenced_by": "Referenced by",
+  "referenced_by_none": "No open object refers to this one.",
+  "filter_fields": "Filter fields",
+  "show_more": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "Show {countText} more"
+      }
+    }
+  ],
+  "item_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} item",
+        "countPlural=other": "{countText} items"
+      }
+    }
+  ],
+  "bytes_inline": "Show bytes",
+  "bytes_hide": "Hide bytes",
+  "copy": "Copy",
+  "copied": "Copied",
+  "copy_json": "Copy JSON",
+  "object_error": "This object couldn't be read exactly",
+  "raw_bytes": "Stored bytes",
+  "error_no_layout": "The file has no type tree for this class, and no layout table covers it.",
+  "error_truncated": "The layout reads past the end of the object.",
+  "error_trailing_bytes": "The layout ends before the end of the object.",
+  "error_invalid_layout": "The layout can't be interpreted.",
+  "error_malformed": "A stored value contradicts the file.",
+  "error_unresolved_reference_type": "A managed reference names a type the file doesn't list.",
+  "error_obfuscation": "The bundle header isn't one this tool knows.",
+  "error_other": "The core reported: {reason}",
+  "about_privacy": "Everything runs locally. Nothing is uploaded.",
+  "objects": "Objects"
+}

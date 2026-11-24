@@ -1,0 +1,139 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "Sekai Explorer",
+  "app_tagline": "在瀏覽器裡讀遊戲 Unity 包裡的物件。",
+  "welcome_title": "開啟資源包開始探索",
+  "welcome_body": "把資源包或資料夾拖到這裡，或在下面選擇。檔案只在本瀏覽器裡讀取，不會上傳。",
+  "welcome_drop": "放開即可開啟",
+  "experimental": "實驗性",
+  "open_files": "選擇檔案",
+  "open_folder": "選擇資料夾",
+  "reading": "正在讀取資源包…",
+  "read_failed": "無法讀取這些資源包：{reason}",
+  "bundle_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 個包"
+      }
+    }
+  ],
+  "object_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 個物件"
+      }
+    }
+  ],
+  "failure_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 個無法讀取"
+      }
+    }
+  ],
+  "search": "搜尋",
+  "search_placeholder": "包名、物件名、類別、容器路徑或 path ID",
+  "search_empty": "沒有符合項目",
+  "search_bundles": "資源包",
+  "search_objects": "物件",
+  "back": "上一步",
+  "forward": "下一步",
+  "theme": "主題",
+  "theme_system": "跟隨系統",
+  "theme_light": "淺色",
+  "theme_dark": "深色",
+  "language": "語言",
+  "library": "庫",
+  "library_filter": "篩選包和物件",
+  "unreadable_bundles": "無法讀取的包",
+  "overview": "總覽",
+  "inspector": "檢查器",
+  "details": "詳情",
+  "nothing_selected": "在庫裡選一個包或物件。",
+  "not_found": "開啟的包裡沒有這個位置。開啟同一批包即可回到這裡。",
+  "entries": "條目",
+  "entry_serialized": "序列化檔案",
+  "entry_resource": "資源檔案",
+  "classes": "類別",
+  "externals": "外部檔案",
+  "external_builtin": "引擎內建",
+  "external_not_open": "未開啟",
+  "unity_version": "Unity 版本",
+  "serialized_version": "格式版本",
+  "type_trees": "型別樹",
+  "yes": "有",
+  "no": "無",
+  "class": "類別",
+  "class_id": "類別 ID",
+  "script": "腳本",
+  "script_unresolved": "無法解析",
+  "path_id": "Path ID",
+  "bundle": "包",
+  "file": "檔案",
+  "container": "容器路徑",
+  "size": "大小",
+  "referenced_by": "被誰引用",
+  "referenced_by_none": "開啟的物件裡沒有引用它的。",
+  "filter_fields": "篩選欄位",
+  "show_more": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "再顯示 {countText} 項"
+      }
+    }
+  ],
+  "item_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 項"
+      }
+    }
+  ],
+  "bytes_inline": "顯示位元組",
+  "bytes_hide": "隱藏位元組",
+  "copy": "複製",
+  "copied": "已複製",
+  "copy_json": "複製 JSON",
+  "object_error": "這個物件無法被精確讀取",
+  "raw_bytes": "儲存的位元組",
+  "error_no_layout": "檔案裡沒有這個類別的型別樹，也沒有佈局表涵蓋它。",
+  "error_truncated": "按佈局讀取超出了物件末尾。",
+  "error_trailing_bytes": "佈局在物件末尾之前就結束了。",
+  "error_invalid_layout": "無法解釋這個佈局。",
+  "error_malformed": "某個儲存值與檔案矛盾。",
+  "error_unresolved_reference_type": "託管引用指向了檔案未列出的型別。",
+  "error_obfuscation": "不認識這個包的檔案頭。",
+  "error_other": "核心回報：{reason}",
+  "about_privacy": "一切都在本機執行，不上傳任何東西。",
+  "objects": "物件"
+}

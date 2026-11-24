@@ -1,0 +1,139 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "Sekai Explorer",
+  "app_tagline": "在浏览器里读游戏 Unity 包里的对象。",
+  "welcome_title": "打开资源包开始探索",
+  "welcome_body": "把资源包或文件夹拖到这里，或在下面选择。文件只在本浏览器里读取，不会上传。",
+  "welcome_drop": "松开即可打开",
+  "experimental": "实验性",
+  "open_files": "选择文件",
+  "open_folder": "选择文件夹",
+  "reading": "正在读取资源包…",
+  "read_failed": "无法读取这些资源包：{reason}",
+  "bundle_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 个包"
+      }
+    }
+  ],
+  "object_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 个对象"
+      }
+    }
+  ],
+  "failure_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 个无法读取"
+      }
+    }
+  ],
+  "search": "搜索",
+  "search_placeholder": "包名、对象名、类、容器路径或 path ID",
+  "search_empty": "没有匹配项",
+  "search_bundles": "资源包",
+  "search_objects": "对象",
+  "back": "后退",
+  "forward": "前进",
+  "theme": "主题",
+  "theme_system": "跟随系统",
+  "theme_light": "浅色",
+  "theme_dark": "深色",
+  "language": "语言",
+  "library": "库",
+  "library_filter": "筛选包和对象",
+  "unreadable_bundles": "无法读取的包",
+  "overview": "总览",
+  "inspector": "检查器",
+  "details": "详情",
+  "nothing_selected": "在库里选一个包或对象。",
+  "not_found": "打开的包里没有这个位置。打开同一批包即可回到这里。",
+  "entries": "条目",
+  "entry_serialized": "序列化文件",
+  "entry_resource": "资源文件",
+  "classes": "类",
+  "externals": "外部文件",
+  "external_builtin": "引擎内置",
+  "external_not_open": "未打开",
+  "unity_version": "Unity 版本",
+  "serialized_version": "格式版本",
+  "type_trees": "类型树",
+  "yes": "有",
+  "no": "无",
+  "class": "类",
+  "class_id": "类 ID",
+  "script": "脚本",
+  "script_unresolved": "无法解析",
+  "path_id": "Path ID",
+  "bundle": "包",
+  "file": "文件",
+  "container": "容器路径",
+  "size": "大小",
+  "referenced_by": "被谁引用",
+  "referenced_by_none": "打开的对象里没有引用它的。",
+  "filter_fields": "筛选字段",
+  "show_more": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "再显示 {countText} 项"
+      }
+    }
+  ],
+  "item_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=*": "{countText} 项"
+      }
+    }
+  ],
+  "bytes_inline": "显示字节",
+  "bytes_hide": "隐藏字节",
+  "copy": "复制",
+  "copied": "已复制",
+  "copy_json": "复制 JSON",
+  "object_error": "这个对象无法被精确读取",
+  "raw_bytes": "存储的字节",
+  "error_no_layout": "文件里没有这个类的类型树，也没有布局表覆盖它。",
+  "error_truncated": "按布局读取超出了对象末尾。",
+  "error_trailing_bytes": "布局在对象末尾之前就结束了。",
+  "error_invalid_layout": "无法解释这个布局。",
+  "error_malformed": "某个存储值与文件矛盾。",
+  "error_unresolved_reference_type": "托管引用指向了文件未列出的类型。",
+  "error_obfuscation": "不认识这个包的文件头。",
+  "error_other": "核心报告：{reason}",
+  "about_privacy": "一切都在本地运行，不上传任何东西。",
+  "objects": "对象"
+}

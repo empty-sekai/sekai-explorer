@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --text-2xs: 11px;
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-hover: var(--hover);
+  --color-selected: var(--selected);
+}
+
+:root {
+  --font-cjk: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC";
+  --canvas: oklch(0.975 0.003 260);
+  --surface: oklch(1 0 0);
+  --raised: oklch(0.99 0.002 260);
+  --line: oklch(0.91 0.005 260);
+  --line-strong: oklch(0.84 0.008 260);
+  --ink: oklch(0.22 0.01 260);
+  --ink-soft: oklch(0.45 0.012 260);
+  --ink-faint: oklch(0.62 0.01 260);
+  --accent: oklch(0.55 0.17 255);
+  --accent-soft: oklch(0.94 0.035 255);
+  --danger: oklch(0.55 0.19 25);
+  --danger-soft: oklch(0.95 0.03 25);
+  --hover: oklch(0.955 0.004 260);
+  --selected: oklch(0.93 0.03 255);
+  --class-texture: oklch(0.62 0.15 240);
+  --class-mesh: oklch(0.62 0.14 155);
+  --class-material: oklch(0.66 0.16 50);
+  --class-animation: oklch(0.62 0.18 350);
+  --class-script: oklch(0.58 0.17 290);
+  --class-scene: oklch(0.6 0.02 260);
+  --class-media: oklch(0.7 0.14 85);
+  --class-other: oklch(0.72 0.01 260);
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: oklch(0.17 0.006 260);
+  --surface: oklch(0.205 0.007 260);
+  --raised: oklch(0.24 0.008 260);
+  --line: oklch(0.3 0.008 260);
+  --line-strong: oklch(0.38 0.01 260);
+  --ink: oklch(0.93 0.005 260);
+  --ink-soft: oklch(0.72 0.01 260);
+  --ink-faint: oklch(0.56 0.01 260);
+  --accent: oklch(0.72 0.14 255);
+  --accent-soft: oklch(0.3 0.06 255);
+  --danger: oklch(0.72 0.15 25);
+  --danger-soft: oklch(0.3 0.06 25);
+  --hover: oklch(0.255 0.008 260);
+  --selected: oklch(0.3 0.04 255);
+  color-scheme: dark;
+}
+
+/*
+ * Han characters are drawn differently in each language, so each element that names a language
+ * takes that language's fonts. The family is set on the element itself: a custom property
+ * inherited from the root would already be resolved for the root's language.
+ */
+[lang] {
+  font-family: ui-sans-serif, system-ui, "Segoe UI", var(--font-cjk), sans-serif;
+}
+
+:lang(ja) {
+  --font-cjk: "Hiragino Sans", "Yu Gothic UI", "Meiryo", "Noto Sans CJK JP";
+}
+
+:lang(zh-Hant) {
+  --font-cjk: "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC";
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-canvas text-ink text-[13px] antialiased;
+}
+
+:focus-visible {
+  @apply outline-2 outline-offset-1 outline-accent;
+}
