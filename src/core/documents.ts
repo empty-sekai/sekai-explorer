@@ -83,6 +83,11 @@ export function resolve(reference: Reference, from: Address): Target {
   return { address: { bundle: bundle ?? from.bundle, file: file ?? from.file, id } };
 }
 
+/** Whether an external path names a file of a bundle, rather than an engine resource. */
+export function isBundleFile(path: string): boolean {
+  return path.startsWith("archive:/");
+}
+
 /** A key that identifies an address, for maps and caches. */
 export function keyOf(address: Address): string {
   return `${address.bundle}\n${address.file}\n${address.id}`;

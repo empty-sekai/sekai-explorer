@@ -5,6 +5,9 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
+/** The bytes of a file a model names by a path relative to itself, if there is one. */
+export type FileOf = (path: string) => Promise<Uint8Array | undefined>;
+
 export class Viewer {
   readonly #renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   readonly #scene = new THREE.Scene();
@@ -30,10 +33,18 @@ export class Viewer {
     this.#renderer.setAnimationLoop((time) => this.#frame(time));
   }
 
-  /** Shows the model `bytes` holds, and returns the names of its animations. */
-  async load(bytes: Uint8Array): Promise<string[]> {
+  /**
+   * Shows the model `bytes` holds, with the images it names read through `fileOf`, and returns
+   * the names of its animations.
+   */
+  async load(bytes: Uint8Array, fileOf: FileOf): Promise<string[]> {
     const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    const gltf = await new GLTFLoader().parseAsync(buffer as ArrayBuffer, "");
+    const images = await imageUrls(buffer as ArrayBuffer, fileOf);
+    const manager = new THREE.LoadingManager();
+    manager.setURLModifier((url) => images.get(url) ?? url);
+    const gltf = await new GLTFLoader(manager).parseAsync(buffer as ArrayBuffer, "");
+    for (const url of images.values()) URL.revokeObjectURL(url);
+    withoutVertexColors(gltf.scene);
     this.#model = gltf.scene;
     this.#scene.add(gltf.scene);
     this.#skeleton = new THREE.SkeletonHelper(gltf.scene);
@@ -108,4 +119,34 @@ export class Viewer {
     this.#controls.update();
     this.#renderer.render(this.#scene, this.#camera);
   }
+}
+
+/** An object URL for each image the GLB file in `buffer` names by path, by that path. */
+async function imageUrls(buffer: ArrayBuffer, fileOf: FileOf): Promise<Map<string, string>> {
+  const urls = new Map<string, string>();
+  for (const path of imagePaths(buffer)) {
+    const bytes = await fileOf(path);
+    if (bytes) urls.set(path, URL.createObjectURL(new Blob([bytes as BlobPart])));
+  }
+  return urls;
+}
+
+/** The paths of the images a GLB file names, read from its JSON chunk, the first after the header. */
+function imagePaths(buffer: ArrayBuffer): string[] {
+  const length = new DataView(buffer).getUint32(12, true);
+  const json: { images?: { uri?: string }[] } = JSON.parse(
+    new TextDecoder().decode(new Uint8Array(buffer, 20, length)),
+  );
+  return (json.images ?? []).flatMap((image) => (image.uri ? [image.uri] : []));
+}
+
+/**
+ * Draws the meshes of `scene` without their vertex colours. Game shaders keep other data in them,
+ * such as outline widths, so tinting the base colour with them, as glTF says, miscolours a model.
+ */
+function withoutVertexColors(scene: THREE.Object3D) {
+  scene.traverse((node) => {
+    if (!(node instanceof THREE.Mesh)) return;
+    for (const material of [node.material].flat()) material.vertexColors = false;
+  });
 }

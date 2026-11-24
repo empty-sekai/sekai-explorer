@@ -1,13 +1,9 @@
-// The references between the objects of the open bundles, followed either way: what an object
-// refers to, what refers to it, the objects near one, and the references among a set.
+// The references between the objects of the open bundles, followed either way.
 
 import { type Address, keyOf } from "./documents";
 
 /** A reference from one object to another, in the field that holds it. */
 export type Link = { from: Address; to: Address; field: string };
-
-/** Objects and the references among them. */
-export type Graph = { objects: Address[]; links: Link[]; truncated: boolean };
 
 export class Links {
   readonly #from = new Map<string, Link[]>();
@@ -28,49 +24,13 @@ export class Links {
     return this.#to.get(keyOf(address)) ?? [];
   }
 
-  /**
-   * The objects at most `depth` references from `center`, either way, and the references among
-   * them. At most `limit` objects are taken, nearest first; `truncated` says whether any were
-   * left out.
-   */
-  near(center: Address, depth: number, limit: number): Graph {
-    const found = new Map([[keyOf(center), center]]);
-    let ring = [center];
-    let truncated = false;
-    for (let step = 0; step < depth && ring.length > 0; step++) {
-      const next: Address[] = [];
-      for (const address of ring) {
-        const neighbours = [
-          ...this.from(address).map((link) => link.to),
-          ...this.to(address).map((link) => link.from),
-        ];
-        for (const neighbour of neighbours) {
-          const key = keyOf(neighbour);
-          if (found.has(key)) continue;
-          if (found.size >= limit) {
-            truncated = true;
-            continue;
-          }
-          found.set(key, neighbour);
-          next.push(neighbour);
-        }
-      }
-      ring = next;
-    }
-    const objects = [...found.values()];
-    return { objects, links: this.among(objects), truncated };
-  }
-
-  /** The references among `objects`. */
-  among(objects: Address[]): Link[] {
-    const inside = new Set(objects.map(keyOf));
-    return objects.flatMap((address) =>
-      this.from(address).filter((link) => inside.has(keyOf(link.to))),
-    );
+  /** Every reference. */
+  *all(): Generator<Link> {
+    for (const links of this.#from.values()) yield* links;
   }
 }
 
-function push<K, V>(map: Map<K, V[]>, key: K, value: V) {
+export function push<K, V>(map: Map<K, V[]>, key: K, value: V) {
   const list = map.get(key);
   if (list) list.push(value);
   else map.set(key, [value]);

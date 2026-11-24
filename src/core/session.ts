@@ -1,17 +1,20 @@
 // The bundles of one exploration, held open by the core, and the questions the interface asks
 // about them. It runs in the core's worker.
 
+import { type Dependency, dependencies, isDependency } from "./dependencies";
 import {
   type Address,
   type Entry,
   type External,
+  isBundleFile,
   keyOf,
   type ObjectDocument,
   references,
   resolve,
   type UnityObject,
 } from "./documents";
-import { type Graph, type Link, Links } from "./links";
+import { type Link, Links } from "./links";
+import { type Direction, type Drawing, Units } from "./units";
 
 /** What the library lists about an object: everything but its fields. */
 export type ObjectSummary = {
@@ -89,6 +92,9 @@ export class Session {
   readonly #objects = new Map<string, UnityObject>();
   readonly #links = new Links();
   readonly #payloads = new Map<string, Uint8Array>();
+  /** The dependencies the AssetBundle object of each bundle lists. */
+  readonly #declared = new Map<string, string[]>();
+  #units: Units | undefined;
 
   /** Reads the object document of every bundle `core` holds. */
   constructor(core: Explorer) {
@@ -100,15 +106,8 @@ export class Session {
           core.document(bundle, (sha256, bytes) => this.#payloads.set(sha256, bytes)),
         ),
       );
-    for (const document of documents) {
-      for (const file of document.files) {
-        for (const object of file.objects) {
-          const address = { bundle: document.bundle, file: file.path, id: object.id };
-          this.#objects.set(keyOf(address), object);
-          this.#index(address, object);
-        }
-      }
-    }
+    const open = new Set(documents.map((document) => document.bundle));
+    for (const document of documents) this.#load(document, open);
     const failures: [string, string][] = JSON.parse(core.failed());
     this.library = {
       bundles: documents.map(summary),
@@ -125,14 +124,29 @@ export class Session {
     return this.#links.to(address);
   }
 
-  /** The objects at most `depth` references from `center`, either way, at most `limit`. */
-  near(center: Address, depth: number, limit: number): Graph {
-    return this.#links.near(center, depth, limit);
+  /** The units at most `depth` ties from the unit of `center`, at most `limit` of them. */
+  around(center: Address, direction: Direction, depth: number, limit: number): Drawing {
+    return this.#drawn().around(center, direction, depth, limit);
   }
 
-  /** The references among `objects`. */
-  among(objects: Address[]): Link[] {
-    return this.#links.among(objects);
+  /** The units that hold `objects`, and the ties among them. */
+  gather(objects: Address[]): Drawing {
+    return this.#drawn().gather(objects);
+  }
+
+  /** The bundles each open bundle depends on. */
+  dependencies(): Dependency[] {
+    return dependencies(this.#links.all(), this.#declared, (address) => this.#classOf(address));
+  }
+
+  /** The references objects of the bundle `from` make to objects of the bundle `to`. */
+  between(from: string, to: string): Link[] {
+    return [...this.#links.all()].filter(
+      (link) =>
+        link.from.bundle === from &&
+        link.to.bundle === to &&
+        isDependency(link, (address) => this.#classOf(address)),
+    );
   }
 
   /** A byte payload too large to be written inline, by its SHA-256. */
@@ -161,14 +175,83 @@ export class Session {
     return this.#core.file(`${member.sha256}.${member.extension}`);
   }
 
-  #index(from: Address, object: UnityObject) {
+  /** The objects as units, worked out the first time a drawing is asked for. */
+  #drawn(): Units {
+    this.#units ??= new Units(this.#links.all(), (address) => this.#classOf(address));
+    return this.#units;
+  }
+
+  #classOf(address: Address): string | undefined {
+    return this.#objects.get(keyOf(address))?.class;
+  }
+
+  /** Keeps the objects of `document` and indexes their references; `open` names every bundle. */
+  #load(document: ObjectDocument, open: ReadonlySet<string>) {
+    const declared = declaredDependencies(document);
+    this.#declared.set(document.bundle, declared);
+    const unopened = unopenedFiles(
+      document,
+      declared.filter((name) => !open.has(name)),
+    );
+    for (const file of document.files) {
+      for (const object of file.objects) {
+        const address = { bundle: document.bundle, file: file.path, id: object.id };
+        this.#objects.set(keyOf(address), object);
+        this.#index(address, object, unopened);
+      }
+    }
+  }
+
+  /**
+   * Indexes the references of `object`, with those into files no open bundle holds placed where
+   * `unopened` says. References to engine resources are left out.
+   */
+  #index(from: Address, object: UnityObject, unopened: Map<string, FileAt>) {
     if (object.fields === null) return;
     for (const [field, reference] of references(object.fields)) {
       const target = resolve(reference, from);
-      if (!("address" in target)) continue;
-      this.#links.add({ from, to: target.address, field });
+      const file = "external" in target ? unopened.get(target.external) : undefined;
+      const to = "address" in target ? target.address : file && { ...file, id: target.id };
+      if (to) this.#links.add({ from, to, field });
     }
   }
+}
+
+/** A serialized file of a bundle. */
+type FileAt = NonNullable<External["target"]>;
+
+/**
+ * Where each file of another bundle that `document` refers to, and no open bundle holds, lives.
+ * When the document declares exactly one dependency that is not open and refers to exactly one
+ * such file, the file is that bundle's; otherwise the file stands for its bundle under its own name.
+ */
+function unopenedFiles(document: ObjectDocument, unopened: string[]): Map<string, FileAt> {
+  const paths = new Set(
+    document.files
+      .flatMap((file) => file.externals)
+      .filter((external) => external.target === null && isBundleFile(external.path))
+      .map((external) => external.path),
+  );
+  const named = paths.size === 1 && unopened.length === 1 ? unopened[0] : undefined;
+  return new Map(
+    [...paths].map((path) => {
+      const file = path.slice(path.lastIndexOf("/") + 1);
+      return [path, { bundle: named ?? file, file }];
+    }),
+  );
+}
+
+/** The bundle names the AssetBundle object of `document` lists in `m_Dependencies`. */
+function declaredDependencies(document: ObjectDocument): string[] {
+  const object = document.files
+    .flatMap((file) => file.objects)
+    .find((each) => each.class === "AssetBundle");
+  const fields = object?.fields;
+  const listed =
+    fields && typeof fields === "object" && !Array.isArray(fields) && "m_Dependencies" in fields
+      ? fields.m_Dependencies
+      : undefined;
+  return Array.isArray(listed) ? listed.filter((name) => typeof name === "string") : [];
 }
 
 function summary(document: ObjectDocument): BundleSummary {

@@ -94,7 +94,7 @@ function Members({ document }: { document: AssetDocument }) {
         ))}
       </div>
       <div className="pt-2">
-        <MemberPreview key={member.sha256} member={member} asset={document.name} />
+        <MemberPreview key={member.sha256} member={member} document={document} />
       </div>
     </>
   );

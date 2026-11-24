@@ -4,7 +4,7 @@
 import type { ObjectDocument, SerializedFile, UnityObject } from "~/core/documents";
 import type { Explorer } from "~/core/session";
 
-const object = (
+export const object = (
   id: string,
   cls: string,
   fields: UnityObject["fields"],
@@ -19,7 +19,7 @@ const object = (
   fields,
 });
 
-const file = (
+export const file = (
   path: string,
   objects: UnityObject[],
   externals: SerializedFile["externals"] = [],

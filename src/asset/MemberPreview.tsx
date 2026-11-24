@@ -2,11 +2,12 @@
 
 import { Download, LoaderCircle } from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { useMember } from "~/core/queries";
-import type { Member } from "~/core/session";
+import { fetchMember, useMember } from "~/core/queries";
+import type { AssetDocument, Member } from "~/core/session";
 import { Hex } from "~/inspector/BytesView";
 import { m } from "~/paraglide/messages.js";
 import { Button } from "~/ui/ui";
+import type { FileOf } from "./viewer";
 
 // three.js is large, so it loads only when a model is shown.
 const ModelViewer = lazy(async () => ({ default: (await import("./ModelViewer")).ModelViewer }));
@@ -34,20 +35,35 @@ const KINDS: Record<string, Kind> = {
 /** How much text a preview shows. */
 const TEXT_SHOWN = 256 << 10;
 
-export function MemberPreview({ member, asset }: { member: Member; asset: string }) {
+/** The member `member` of `document`, whose other members it may name by path, as a model does. */
+export function MemberPreview({ member, document }: { member: Member; document: AssetDocument }) {
   const { data: bytes } = useMember(member);
   if (!bytes) return <LoaderCircle className="size-4 animate-spin text-ink-faint" />;
   const kind = KINDS[member.extension.toLowerCase()] ?? "other";
   const type = member.media_type ?? "application/octet-stream";
+  const fileOf = async (path: string) => {
+    const named = document.members.find((each) => `${each.role}.${each.extension}` === path);
+    return named && ((await fetchMember(named)) ?? undefined);
+  };
   return (
     <div className="space-y-2">
-      <Shown kind={kind} bytes={bytes} type={type} />
-      <Save bytes={bytes} type={type} name={fileName(asset, member)} />
+      <Shown kind={kind} bytes={bytes} type={type} fileOf={fileOf} />
+      <Save bytes={bytes} type={type} name={fileName(document.name, member)} />
     </div>
   );
 }
 
-function Shown({ kind, bytes, type }: { kind: Kind; bytes: Uint8Array; type: string }) {
+function Shown({
+  kind,
+  bytes,
+  type,
+  fileOf,
+}: {
+  kind: Kind;
+  bytes: Uint8Array;
+  type: string;
+  fileOf: FileOf;
+}) {
   const url = useUrl(bytes, type);
   switch (kind) {
     case "image":
@@ -61,7 +77,7 @@ function Shown({ kind, bytes, type }: { kind: Kind; bytes: Uint8Array; type: str
     case "model":
       return (
         <Suspense fallback={<LoaderCircle className="size-4 animate-spin text-ink-faint" />}>
-          <ModelViewer bytes={bytes} />
+          <ModelViewer bytes={bytes} fileOf={fileOf} />
         </Suspense>
       );
     case "json":

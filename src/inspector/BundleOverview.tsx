@@ -5,6 +5,8 @@ import { LoaderCircle } from "lucide-react";
 import { useGo } from "~/app/place";
 import { AssetList } from "~/asset/AssetList";
 import type { Catalog } from "~/core/catalog";
+import type { External } from "~/core/documents";
+import { isBundleFile } from "~/core/documents";
 import { useAssets } from "~/core/queries";
 import type { BundleSummary } from "~/core/session";
 import { bytes, count } from "~/lib/format";
@@ -132,7 +134,7 @@ function Externals({ catalog, bundle }: { catalog: Catalog; bundle: BundleSummar
                 <span className="truncate font-mono text-2xs text-ink-soft">{external.path}</span>
               )}
               <span className="text-2xs text-ink-faint">
-                {!target ? m.external_builtin() : !isOpen ? m.external_not_open() : null}
+                {isOpen ? null : missingNote(external)}
               </span>
             </li>
           );
@@ -140,4 +142,11 @@ function Externals({ catalog, bundle }: { catalog: Catalog; bundle: BundleSummar
       </ul>
     </>
   );
+}
+
+/** What an external whose bundle is not open is: in a bundle still to open, or an engine resource. */
+function missingNote(external: External): string {
+  return external.target || isBundleFile(external.path)
+    ? m.external_not_open()
+    : m.external_builtin();
 }

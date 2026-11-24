@@ -1,9 +1,11 @@
 // The questions the interface asks the core, cached until other bundles are opened.
 
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "~/lib/query";
 import { core } from "./client";
 import { type Address, keyOf } from "./documents";
 import type { Member } from "./session";
+import type { Direction } from "./units";
 
 export function useObject(address: Address) {
   return useQuery({
@@ -45,25 +47,44 @@ export function useClosure(name: string) {
 
 /** A file of a converted asset. */
 export function useMember(member: Member) {
-  return useQuery({
+  return useQuery(memberQuery(member));
+}
+
+/** A file of a converted asset, fetched outside a component. */
+export function fetchMember(member: Member): Promise<Uint8Array | null> {
+  return queryClient.fetchQuery(memberQuery(member));
+}
+
+function memberQuery(member: Member) {
+  return {
     queryKey: ["member", member.sha256],
     queryFn: async () => (await core.member(member)) ?? null,
+  };
+}
+
+/** The units at most `depth` ties from the unit of `center`, following `direction`. */
+export function useAround(center: Address, direction: Direction, depth: number, limit: number) {
+  return useQuery({
+    queryKey: ["around", keyOf(center), direction, depth, limit],
+    queryFn: () => core.around(center, direction, depth, limit),
   });
 }
 
-/** The objects at most `depth` references from `center`, either way. */
-export function useNear(center: Address, depth: number, limit: number) {
+/** The units that hold `objects`, fetched only when `wanted`. */
+export function useGathered(objects: Address[], wanted: boolean) {
   return useQuery({
-    queryKey: ["near", keyOf(center), depth, limit],
-    queryFn: () => core.near(center, depth, limit),
-  });
-}
-
-/** The references among `objects`, fetched only when `wanted`. */
-export function useAmong(objects: Address[], wanted: boolean) {
-  return useQuery({
-    queryKey: ["among", objects.map(keyOf)],
-    queryFn: () => core.among(objects),
+    queryKey: ["gather", objects.map(keyOf)],
+    queryFn: () => core.gather(objects),
     enabled: wanted,
   });
+}
+
+/** The bundles each open bundle depends on. */
+export function useDependencies() {
+  return useQuery({ queryKey: ["dependencies"], queryFn: () => core.dependencies() });
+}
+
+/** The references objects of the bundle `from` make to objects of the bundle `to`. */
+export function useBetween(from: string, to: string) {
+  return useQuery({ queryKey: ["between", from, to], queryFn: () => core.between(from, to) });
 }

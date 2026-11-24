@@ -5,6 +5,7 @@ import * as Comlink from "comlink";
 import type { Address } from "./documents";
 import initialize, { Explorer } from "./package/sekai_wasm.js";
 import { type Member, Session } from "./session";
+import type { Direction, Drawing } from "./units";
 
 /** A bundle chosen by the user: its name and the file that holds it. */
 export type Source = { name: string; file: File };
@@ -12,6 +13,8 @@ export type Source = { name: string; file: File };
 const ready = initialize();
 let explorer: Explorer | undefined;
 let session: Session | undefined;
+
+const nothing: Drawing = { units: [], ties: [], truncated: false };
 
 /** `bytes` handed over to the page, without a copy left behind. */
 const handed = (bytes: Uint8Array) => Comlink.transfer(bytes, [bytes.buffer]);
@@ -30,9 +33,11 @@ const api = {
   },
   object: (address: Address) => session?.object(address),
   referrers: (address: Address) => session?.referrers(address) ?? [],
-  near: (center: Address, depth: number, limit: number) =>
-    session?.near(center, depth, limit) ?? { objects: [], links: [], truncated: false },
-  among: (objects: Address[]) => session?.among(objects) ?? [],
+  around: (center: Address, direction: Direction, depth: number, limit: number) =>
+    session?.around(center, direction, depth, limit) ?? nothing,
+  gather: (objects: Address[]) => session?.gather(objects) ?? nothing,
+  dependencies: () => session?.dependencies() ?? [],
+  between: (from: string, to: string) => session?.between(from, to) ?? [],
   payload(sha256: string) {
     const copy = session?.payload(sha256)?.slice();
     return copy && handed(copy);

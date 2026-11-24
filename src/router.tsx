@@ -12,7 +12,8 @@ import { Root } from "~/app/Root";
 
 /**
  * A place: a bundle (`b`), an object of it by serialized file (`f`) and path ID (`o`), or an
- * asset it makes (`a`). With `g`, the object is shown as the centre of a graph.
+ * asset it makes (`a`). `g` names a graph to show instead: `objects` around the object, or how the
+ * open `bundles` depend on each other.
  */
 export type Place = { b?: string; f?: string; o?: string; a?: string; g?: string };
 

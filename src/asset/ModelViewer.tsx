@@ -1,10 +1,11 @@
-// A GLB member, shown in three.js with its skeleton, a wireframe and its animations.
+// A GLB member, shown in three.js with its textures, its skeleton, a wireframe and its animations.
+// The textures are other members of the asset, which the model names by path.
 
 import { useEffect, useRef, useState } from "react";
 import { m } from "~/paraglide/messages.js";
-import { Viewer } from "./viewer";
+import { type FileOf, Viewer } from "./viewer";
 
-export function ModelViewer({ bytes }: { bytes: Uint8Array }) {
+export function ModelViewer({ bytes, fileOf }: { bytes: Uint8Array; fileOf: FileOf }) {
   const host = useRef<HTMLDivElement>(null);
   const viewer = useRef<Viewer>(null);
   const [clips, setClips] = useState<string[]>([]);
@@ -14,9 +15,9 @@ export function ModelViewer({ bytes }: { bytes: Uint8Array }) {
     if (!host.current) return;
     const shown = new Viewer(host.current);
     viewer.current = shown;
-    shown.load(bytes).then(setClips, (error) => setFailure(String(error)));
+    shown.load(bytes, fileOf).then(setClips, (error) => setFailure(String(error)));
     return () => shown.dispose();
-  }, [bytes]);
+  }, [bytes, fileOf]);
 
   if (failure) return <p className="text-danger">{m.model_failed({ reason: failure })}</p>;
   return (

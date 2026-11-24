@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { Session } from "~/core/session";
-import { core, model, shader } from "./fixtures";
+import { core, file, model, object, shader } from "./fixtures";
 
 const session = new Session(core([model, shader], [["broken", "obfuscation"]]));
 
@@ -27,11 +27,23 @@ test("finds who refers to an object, across bundles, with the field", () => {
   ]);
 });
 
-test("draws the objects near one, and the references among a set", () => {
-  const near = session.near(material, 2, 100);
-  expect(near.objects).toEqual([material, body("3"), body("1")]);
-  expect(near.truncated).toBe(false);
-  expect(session.among([body("3"), material]).map((link) => link.field)).toEqual([
+test("draws a GameObject with what it uses, across bundles", () => {
+  const drawing = session.around(body("3"), "uses", 1, 100);
+  expect(drawing.units.map((unit) => unit.address)).toEqual([body("1"), material]);
+  expect(drawing.ties.map((tie) => tie.fields)).toEqual([["m_Materials[0]"]]);
+});
+
+test("lists the bundles a bundle depends on", () => {
+  expect(session.dependencies()).toEqual([
+    {
+      from: "model/body",
+      to: "shader/common",
+      declared: false,
+      count: 1,
+      lists: [["m_Materials[]", 1]],
+    },
+  ]);
+  expect(session.between("model/body", "shader/common").map((link) => link.field)).toEqual([
     "m_Materials[0]",
   ]);
 });
@@ -43,4 +55,37 @@ test("keeps payloads by hash", () => {
 test("lists the assets a bundle plans", () => {
   expect(session.assets("model")).toEqual([{ name: "a/b", form: "texture", path_id: "1" }]);
   expect(session.convert("a/b")).toBeNull();
+});
+
+test("places references into a bundle that is not open under the dependency it declares", () => {
+  const external = "archive:/CAB-z/CAB-z";
+  const cake = new Session(
+    core([
+      {
+        format: "objects",
+        version: 1,
+        bundle: "fixture/cake",
+        entries: [],
+        files: [
+          file(
+            "CAB-c",
+            [
+              object("1", "AssetBundle", { m_Dependencies: ["effect/candle"] }),
+              object("2", "ParticleSystem", { m_Effect: { $ref: { external, id: "5" } } }),
+            ],
+            [{ index: 1, path: external, target: null }],
+          ),
+        ],
+      },
+    ]),
+  );
+  expect(cake.dependencies()).toEqual([
+    {
+      from: "fixture/cake",
+      to: "effect/candle",
+      declared: true,
+      count: 1,
+      lists: [["m_Effect", 1]],
+    },
+  ]);
 });
